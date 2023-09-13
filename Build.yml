@@ -96,7 +96,7 @@ stages:
                               throw "Error with git rebase to temp!"
                               exit
                           }
-                      git push origin HEAD:$(branchName)
+                      git push origin HEAD:"dev"
                       if (-not $?) 
                           {
                               throw "Error with git push!"
