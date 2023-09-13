@@ -84,7 +84,7 @@ stages:
                               throw "Error with git remote i.e. passing personal access token!"
                               exit
                           }
-                      git fetch origin "dev":tmp
+                      git fetch origin "Dev":tmp
                       if (-not $?) 
                           {
                               throw "Error with git fetch from origin branch check if branch exists (i.e. dev)!"
@@ -96,7 +96,7 @@ stages:
                               throw "Error with git rebase to temp!"
                               exit
                           }
-                      git push origin HEAD:"dev"
+                      git push origin HEAD:"Dev"
                       if (-not $?) 
                           {
                               throw "Error with git push!"
