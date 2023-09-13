@@ -6,7 +6,7 @@
 pool:
   vmImage: 'windows-2019'
 
-name: $(major).$(minor)$(Rev:.r)
+name: 1.0$(Rev:.r)
 
 
 stages:
