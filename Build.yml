@@ -39,13 +39,13 @@ stages:
                                   $new_Name = $Formated_Name + '_' + '$(Build.BuildNumber)'  + '.pbix'
                                   Rename-Item -Path $files.FullName -NewName $new_Name                        
                               }
-                      git config --global user.email $(useremailid)
+                      git config --global user.email "ashutosh.d.kumar@capgemini.com"
                       if (-not $?) 
                           {
                               throw "Error with git config i.e. user email!"
                               exit
                           }
-                      git config --global user.name $(username)
+                      git config --global user.name "Ashutosh"
                       if (-not $?) 
                           {
                               throw "Error with git config i.e. user name!"
