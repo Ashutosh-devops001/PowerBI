@@ -96,8 +96,8 @@ stages:
                               throw "Error with git rebase to temp!"
                               exit
                           }
-                      git config --global push.autoSetupRemote true
-                      git push origin HEAD:"Dev"
+                      
+                      git push --set-upstream origin Dev
                       if (-not $?) 
                           {
                               throw "Error with git push!"
