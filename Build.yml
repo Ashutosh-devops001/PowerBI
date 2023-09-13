@@ -1,0 +1,119 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+pool:
+  vmImage: 'windows-2019'
+
+name: $(major).$(minor)$(Rev:.r)
+
+
+stages:
+- stage: Build_Steps
+  displayName: Build_Steps
+ 
+  jobs:  
+  - job: Build_Steps_Job
+    displayName: Build_Steps_Job
+    steps:   
+      - script: echo $(Build.BuildNumber)
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: 'PowerBI_ReportFiles'
+          Contents: '**'
+          TargetFolder: '$(build.artifactstagingdirectory)\$(Build.BuildNumber)\PowerBI_ReportFiles'
+
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: |
+              try
+                  {
+                      $report_FolderPath = "$(build.artifactstagingdirectory)\$(Build.BuildNumber)\PowerBI_ReportFiles"
+                      Write-Host "$report_FolderPath"
+                      $packages = Get-ChildItem -path $report_FolderPath -Recurse -Include *.pbix
+                      foreach ($files in $packages)
+                              {
+                                  $Formated_Name = $files.Name -replace '.pbix'
+                                  $new_Name = $Formated_Name + '_' + '$(Build.BuildNumber)'  + '.pbix'
+                                  Rename-Item -Path $files.FullName -NewName $new_Name                        
+                              }
+                      git config --global user.email $(useremailid)
+                      if (-not $?) 
+                          {
+                              throw "Error with git config i.e. user email!"
+                              exit
+                          }
+                      git config --global user.name $(username)
+                      if (-not $?) 
+                          {
+                              throw "Error with git config i.e. user name!"
+                              exit
+                          }
+                      cd $report_FolderPath
+                      Write-Host "$report_FolderPath"
+                      git init
+                      if (-not $?) 
+                          {
+                              throw "Error with git init!"
+                              exit
+                          }
+                      git status
+                      if (-not $?) 
+                          {
+                              throw "Error with git status!"
+                              exit
+                          }
+                      git add $report_FolderPath/*
+                      if (-not $?) 
+                          {
+                              throw "Error with staging file i.e. git add !"
+                              exit
+                          }
+                      git commit -m "Adding file"
+                      if (-not $?) 
+                          {
+                              throw "Error with git commit!"
+                              exit
+                          }
+                      write-host "Package Uploaded to GitHub"      
+                      git remote add origin $(repourl)
+                      if (-not $?) 
+                          {
+                              throw "Error with git remote i.e. passing personal access token!"
+                              exit
+                          }
+                      git fetch origin $(branchName):tmp
+                      if (-not $?) 
+                          {
+                              throw "Error with git fetch from origin branch check if branch exists (i.e. dev)!"
+                              exit
+                          }
+                      git rebase tmp
+                      if (-not $?) 
+                          {
+                              throw "Error with git rebase to temp!"
+                              exit
+                          }
+                      git push origin HEAD:$(branchName)
+                      if (-not $?) 
+                          {
+                              throw "Error with git push!"
+                          }
+                      git branch -D tmp 
+                          {
+                              throw "Error with git delete temp!"
+                          }
+                  }
+              catch
+                  {
+                      $error_Message = $_.Exception.Message
+                      Write-Error "$($error_Message) " -ErrorAction Stop   
+                  }            
+            
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(build.artifactstagingdirectory)\$(Build.BuildNumber)'
+          publishLocation: 'pipeline'
+          artifactName: drop1
