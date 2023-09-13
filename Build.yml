@@ -78,7 +78,7 @@ stages:
                               exit
                           }
                       write-host "Package Uploaded to GitHub"      
-                      git remote add origin $(repourl)
+                      git remote add origin "https://github.com/Ashutosh-devops001/PowerBI"
                       if (-not $?) 
                           {
                               throw "Error with git remote i.e. passing personal access token!"
