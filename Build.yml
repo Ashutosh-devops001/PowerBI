@@ -84,7 +84,7 @@ stages:
                               throw "Error with git remote i.e. passing personal access token!"
                               exit
                           }
-                      git fetch origin $(branchName):tmp
+                      git fetch origin "dev":tmp
                       if (-not $?) 
                           {
                               throw "Error with git fetch from origin branch check if branch exists (i.e. dev)!"
